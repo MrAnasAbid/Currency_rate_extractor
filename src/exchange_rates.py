@@ -1,10 +1,19 @@
 import os
+import sys
 import requests
 import pandasql as ps
 import sqlite3
 from pandas import DataFrame, read_sql_query, concat
 from dotenv import load_dotenv
-from constants import BASE_CURRENCY
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from src.constants import BASE_CURRENCY
+
+# To do:
+"""
+Enhance the database schema (no need to store currency names during each update) -> Create a new table for currency names
+Use an insert check query to avoid duplicates, not replace the entire table
+"""
 
 # Load environment variables from a .env file
 load_dotenv()
@@ -33,7 +42,7 @@ result = ps.sqldf(query, locals())
 
 
 # Replace the old data with the new data, this is highly inefficient
-conn = sqlite3.connect('currency_rates.db')
+conn = sqlite3.connect('data/currency_rates.db')
 c = conn.cursor()
 result.to_sql('currency', conn, if_exists='replace', index=False)
 
