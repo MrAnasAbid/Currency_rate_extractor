@@ -1,7 +1,8 @@
 import os
 import requests
 import pandasql as ps
-from pandas import DataFrame
+import sqlite3
+from pandas import DataFrame, read_sql_query, concat
 from dotenv import load_dotenv
 from constants import BASE_CURRENCY
 
@@ -29,4 +30,18 @@ SELECT currency_code, rate, currency_name, date
 FROM highest_rates NATURAL JOIN codes
 """
 result = ps.sqldf(query, locals())
-print(result)
+
+
+# Replace the old data with the new data, this is highly inefficient
+conn = sqlite3.connect('currency_rates.db')
+c = conn.cursor()
+result.to_sql('currency', conn, if_exists='replace', index=False)
+
+query = """
+SELECT *
+FROM currency
+"""
+old_data = read_sql_query(query, conn)
+new_data = concat([old_data, result], ignore_index=True)
+
+new_data.to_sql('currency', conn, if_exists='replace', index=False)
