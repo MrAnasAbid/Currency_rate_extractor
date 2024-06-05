@@ -1,9 +1,14 @@
+import sys
+import os
 from airflow import DAG
 from airflow.operators.python import PythonOperator, BranchPythonOperator
 from airflow.operators.bash import BashOperator
 from datetime import datetime
 from random import randint
-from exchange_rates import fetch_and_merge_exchange_rates  # Make sure this module is available
+
+sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+from src.constants import BASE_CURRENCY
+from src.exchange_rates import fetch_and_merge_exchange_rates  # Make sure this module is available
 
 # Define a function to simulate task branching
 def choose_next_task():

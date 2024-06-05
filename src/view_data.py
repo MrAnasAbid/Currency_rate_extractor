@@ -8,7 +8,7 @@ c = conn.cursor()
 query = """
 SELECT *
 FROM currency_rates
-ORDER BY rate DESC
+ORDER BY date, rate DESC
 """
 data = pd.read_sql_query(query, conn)
 print(data)
