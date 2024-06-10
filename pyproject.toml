@@ -6,15 +6,10 @@ authors = [
     {name = "MrAnasAbid", email = "m.abid.anas@gmail.com"},
 ]
 dependencies = [
-    "pandas>=2.2.2",
-    "tweepy>=4.14.0",
-    "s3fs>=2024.5.0",
-    "python-dotenv>=1.0.1",
-    "pip>=24.0",
-    "pandasql>=0.7.3",
-    "cookiecutter>=2.6.0",
-    "airflow>=0.6",
     "apache-airflow>=2.9.1",
+    "pandas>=2.2.2",
+    "python-dotenv>=1.0.1",
+    "airflow>=0.6",
 ]
 requires-python = "==3.11.*"
 readme = "README.md"
