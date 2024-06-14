@@ -4,19 +4,31 @@ import requests
 import pandas as pd
 import sqlite3
 from dotenv import load_dotenv
+from pathlib import Path
 
-sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
+# ROOT is above the folder this code is in
+ROOT = Path(__file__).resolve().parents[1]
+sys.path.append(str(ROOT))
 from src.constants import BASE_CURRENCY
+
+"""
+Main script to fetch the latest exchange rates and store them in a SQLite database
+Currency rates & codes are stored in two separate tables
+For safety, we import the codes every time we fetch the rates
+This script is to be ran daily
+"""
 
 # Load environment variables from a .env file
 def fetch_and_merge_exchange_rates():
     load_dotenv()
     api_key = os.getenv('EXCHANGE_RATE_API_KEY')
 
-    # Request the latest exchange rates
+    # Request the latest exchange rates and extract the json data
     url_currency_rates = f"https://v6.exchangerate-api.com/v6/{api_key}/latest/{BASE_CURRENCY}"
     req_currency = requests.get(url_currency_rates)
     data = req_currency.json()
+
+    # Transform the data into a pandas DataFrame
     conversion_rates = pd.DataFrame(data['conversion_rates'].items(), columns=['currency_code', 'rate'])
     conversion_rates["date"] = data["time_last_update_utc"].split(" 00:")[0]
 
