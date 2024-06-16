@@ -73,6 +73,9 @@ def fetch_and_merge_exchange_rates():
         VALUES (?, ?, ?)
         ON CONFLICT(currency_code, date) DO UPDATE SET rate=excluded.rate
         """, (row['currency_code'], row['rate'], row['date']))
+    print(f"👍 Inserted {len(conversion_rates)} exchange rates for the date of: {conversion_rates['date'].unique()[0]}")
+    print(f"Current size of the currency_rates table: {c.execute('SELECT COUNT(*) FROM currency_rates').fetchone()[0]} rows")
+    print(f"Current table spans {c.execute('SELECT COUNT(DISTINCT date) FROM currency_rates').fetchone()[0]} days")
 
     # Commit the transaction
     conn.commit()
