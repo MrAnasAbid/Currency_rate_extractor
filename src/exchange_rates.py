@@ -3,7 +3,6 @@ import sys
 import requests
 import pandas as pd
 import sqlite3
-from dotenv import load_dotenv
 from pathlib import Path
 
 # ROOT is above the folder this code is in
@@ -20,7 +19,6 @@ This script is to be ran daily
 
 # Load environment variables from a .env file
 def fetch_and_merge_exchange_rates():
-    load_dotenv(ROOT / '.env')
     api_key = os.getenv('EXCHANGE_RATE_API_KEY')
     print(api_key)
 

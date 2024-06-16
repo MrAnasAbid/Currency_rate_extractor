@@ -31,12 +31,10 @@ jobs:
         if: steps.cache-pipenv.outputs.cache-hit != 'true'
         run: |
           pipenv install --dev 
-
-      - name: Create .env file
-        run: |
-          echo "API_KEY=${{ secrets.EXCHANGE_RATE_API_KEY }}" > .env
         
       - name: Run the script
+        env:
+          EXCHANGE_RATE_API_KEY: ${{ secrets.EXCHANGE_RATE_API_KEY }}
         run: |
           pipenv run python src/exchange_rates.py
 
