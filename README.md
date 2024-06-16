@@ -1,13 +1,6 @@
 # Currency Exchange Rate Scraper
-
-This project is for practice purposes, it fetches the latest exchange rates from an API and updates a SQLite database with the retrieved data. It runs daily using GitHub Actions.
+This project uses GitHub Actions to fetch data from a currency exchange rates API, process it, and insert it into a SQLite3 database. The workflow is scheduled to run daily.
 
 ## Steps
-
-1. **Fetch Data**:
-   - The script retrieves the latest exchange rates and currency codes from the API.
-
-2. **Merge and Save**:
-   - The fetched data is merged and saved into a SQLite database.
-
-This process is currently automated using GitHub Actions. Future plans include integrating with Apache Airflow for more advanced scheduling and deployment.
+Fetch Data: Retrieve the latest exchange rates and currency codes from the API.
+Insert Data: Merge the fetched data and save it into a SQLite database.
