@@ -1,6 +1,7 @@
 name: Extract Exchange Rates Pipeline
 
 on:
+  push:
   schedule:
     - cron: '0 0 * * *'  # Runs daily at midnight UTC
   workflow_dispatch:      # Allows manual triggering
@@ -8,7 +9,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -22,13 +23,14 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install pipenv
-  
+
       - name: Install dependencies
         run: |
           pipenv install --dev 
-          
+
       - name: Run the script
-        run: python src/exchange_rates.py
+        run: |
+          pipenv run python src/exchange_rates.py
 
       - name: Commit files
         run: |
