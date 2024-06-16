@@ -37,6 +37,10 @@ jobs:
         run: |
           pipenv install --dev 
 
+      - name: Create .env file
+        run: |
+          echo "API_KEY=${{ secrets.EXCHANGE_RATE_API_KEY }}" > .env
+        
       - name: Run the script
         run: |
           pipenv run python src/exchange_rates.py
