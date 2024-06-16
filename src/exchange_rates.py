@@ -20,8 +20,9 @@ This script is to be ran daily
 
 # Load environment variables from a .env file
 def fetch_and_merge_exchange_rates():
-    load_dotenv()
+    load_dotenv(ROOT / '.env')
     api_key = os.getenv('EXCHANGE_RATE_API_KEY')
+    print(api_key)
 
     # Request the latest exchange rates and extract the json data
     url_currency_rates = f"https://v6.exchangerate-api.com/v6/{api_key}/latest/{BASE_CURRENCY}"
