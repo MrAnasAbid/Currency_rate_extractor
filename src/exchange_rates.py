@@ -9,6 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT))
 from src.constants import BASE_CURRENCY
+api_key = os.getenv('EXCHANGE_RATE_API_KEY')
 
 """
 Main script to fetch the latest exchange rates and store them in a SQLite database
@@ -19,9 +20,6 @@ This script is to be ran daily
 
 # Load environment variables from a .env file
 def fetch_and_merge_exchange_rates():
-    api_key = os.getenv('EXCHANGE_RATE_API_KEY')
-    print(api_key)
-
     # Request the latest exchange rates and extract the json data
     url_currency_rates = f"https://v6.exchangerate-api.com/v6/{api_key}/latest/{BASE_CURRENCY}"
     req_currency = requests.get(url_currency_rates)
@@ -60,20 +58,29 @@ def fetch_and_merge_exchange_rates():
     """)
 
     # Insert currency names (avoid duplicates)
+    new_currency_names = 0
     for _, row in codes.iterrows():
         c.execute("""
         INSERT OR IGNORE INTO currency_names (currency_code, currency_name)
         VALUES (?, ?)
         """, (row['currency_code'], row['currency_name']))
+        new_currency_names += c.rowcount
+    if new_currency_names == 0:
+        print("No new currency names were added")
 
     # Insert or update currency rates
+    new_currency_rates = 0
     for _, row in conversion_rates.iterrows():
         c.execute("""
-        INSERT INTO currency_rates (currency_code, rate, date)
+        INSERT OR IGNORE INTO currency_rates (currency_code, rate, date)
         VALUES (?, ?, ?)
-        ON CONFLICT(currency_code, date) DO UPDATE SET rate=excluded.rate
         """, (row['currency_code'], row['rate'], row['date']))
-    print(f"👍 Inserted {len(conversion_rates)} exchange rates for the date of: {conversion_rates['date'].unique()[0]}")
+        new_currency_rates += c.rowcount
+    if new_currency_rates == 0:
+        print("No new currency rates were fetched")
+    else:
+        print(f"👍 Inserted {len(conversion_rates)} exchange rates for the date of: {conversion_rates['date'].unique()[0]}")
+    
     print(f"Current size of the currency_rates table: {c.execute('SELECT COUNT(*) FROM currency_rates').fetchone()[0]} rows")
     print(f"Current table spans {c.execute('SELECT COUNT(DISTINCT date) FROM currency_rates').fetchone()[0]} days")
 

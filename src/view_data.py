@@ -1,6 +1,8 @@
 import sqlite3
 import pandas as pd
-# Create a sqlite3 database
+"""
+This script is for verbosing the data in the currency_rates table & checking if data is being updated daily
+"""
 
 conn = sqlite3.connect('data/currency_rates.db')
 c = conn.cursor()

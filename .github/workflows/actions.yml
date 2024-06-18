@@ -38,6 +38,18 @@ jobs:
         run: |
           pipenv run python src/exchange_rates.py
 
+      - name: Run the script to clean data and generate the figure
+        env:
+          EXCHANGE_RATE_API_KEY: ${{ secrets.EXCHANGE_RATE_API_KEY }}
+        run: |
+          pipenv run python src/clean_data.py
+
+      - name: Upload generated figure
+        uses: actions/upload-artifact@v2
+        with:
+          name: generated_figure
+          path: figures/currency_evolution_EUR.png
+
       - name: Commit files
         run: |
           git config --local user.email "actions@github.com"
