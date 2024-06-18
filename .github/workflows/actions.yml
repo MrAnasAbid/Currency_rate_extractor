@@ -7,42 +7,78 @@ on:
   workflow_dispatch:      # Allows manual triggering
 
 jobs:
-  build:
+  setup-environment:
+    name: Setup Environment
     runs-on: ubuntu-latest
+    outputs:
+      python-version: ${{ steps.set-python.outputs.python-version }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Set up Python
+        id: set-python
         uses: actions/setup-python@v2
         with:
           python-version: '3.9'
 
-      - name: Install pipenv
+      - name: Install pipenv and dependencies
         run: |
           python -m pip install --upgrade pipenv wheel
-      - id: cache-pipenv
+          pipenv install --dev
+
+      - name: Cache pipenv dependencies
+        id: cache-pipenv
         uses: actions/cache@v1
         with:
           path: ~/.local/share/virtualenvs
           key: ${{ runner.os }}-pipenv-${{ hashFiles('**/Pipfile.lock') }}
-        
-      - name: Install dependencies
-        if: steps.cache-pipenv.outputs.cache-hit != 'true'
-        run: |
-          pipenv install --dev 
-        
-      - name: Run the script
-        env:
-          EXCHANGE_RATE_API_KEY: ${{ secrets.EXCHANGE_RATE_API_KEY }}
-        run: |
-          pipenv run python src/exchange_rates.py
 
-      - name: Run the script to clean data and generate the figure
+  fetch-exchange-rates:
+    name: Fetch Exchange Rates
+    runs-on: ubuntu-latest
+    needs: setup-environment
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use cached pipenv dependencies
+        if: steps.cache-pipenv.outputs.cache-hit == 'true'
+        run: pipenv install --dev
+
+      - name: Run exchange rates script
         env:
           EXCHANGE_RATE_API_KEY: ${{ secrets.EXCHANGE_RATE_API_KEY }}
-        run: |
-          pipenv run python src/clean_data.py
+        run: pipenv run python src/exchange_rates.py
+
+      - name: Upload database artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: currency_rates_db
+          path: data/currency_rates.db
+
+  generate-figure:
+    name: Generate Figure
+    runs-on: ubuntu-latest
+    needs: [setup-environment, fetch-exchange-rates]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Use cached pipenv dependencies
+        if: steps.cache-pipenv.outputs.cache-hit == 'true'
+        run: pipenv install --dev
+
+      - name: Download database artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: currency_rates_db
+          path: data/
+
+      - name: Run data cleaning and figure generation script
+        env:
+          EXCHANGE_RATE_API_KEY: ${{ secrets.EXCHANGE_RATE_API_KEY }}
+        run: pipenv run python src/clean_data.py
 
       - name: Upload generated figure
         uses: actions/upload-artifact@v2
@@ -50,12 +86,35 @@ jobs:
           name: generated_figure
           path: figures/currency_evolution_EUR.png
 
-      - name: Commit files
+  commit-and-push:
+    name: Commit and Push Changes
+    runs-on: ubuntu-latest
+    needs: generate-figure
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Download database artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: currency_rates_db
+          path: data/
+
+      - name: Download generated figure artifact
+        uses: actions/download-artifact@v2
+        with:
+          name: generated_figure
+          path: figures/
+
+      - name: Configure Git
         run: |
           git config --local user.email "actions@github.com"
           git config --local user.name "GitHub Actions"
+
+      - name: Commit changes
+        run: |
           git add .
-          git diff --quiet && git diff --staged --quiet || git commit -m "Update exchange rates"
+          git diff --quiet && git diff --staged --quiet || git commit -m "Update exchange rates and figure"
 
       - name: Push changes
         run: git push
