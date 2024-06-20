@@ -9,7 +9,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT))
 from src.constants import BASE_CURRENCY
-api_key = os.getenv('EXCHANGE_RATE_API_KEY')
+from src.utils import load_env_variables
 
 """
 Main script to fetch the latest exchange rates and store them in a SQLite database
@@ -19,6 +19,8 @@ This script is to be ran daily
 """
 
 # Load environment variables from a .env file
+api_key, vm_ip, verbose, ssh_host, ssh_port, ssh_user, ssh_key, remote_db_path = load_env_variables()
+
 def fetch_and_merge_exchange_rates():
     # Request the latest exchange rates and extract the json data
     url_currency_rates = f"https://v6.exchangerate-api.com/v6/{api_key}/latest/{BASE_CURRENCY}"
