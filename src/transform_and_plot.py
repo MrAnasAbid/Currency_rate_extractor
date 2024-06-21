@@ -1,16 +1,15 @@
 import os
-import pandas as pd
-import sqlite3
-import requests
 import sys
+import requests
+import pandas as pd
+import paramiko
 import matplotlib.pyplot as plt
-from dotenv import load_dotenv
 from pathlib import Path
-
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT))
-load_dotenv(ROOT / '.env')
-api_key = os.getenv('EXCHANGE_RATE_API_KEY')
+from src.constants import BASE_CURRENCY
+from src.utils import load_env_variables, SQLiteConnection
+from src.queries import create_tables_queries, currency_code_queries, currency_rate_queries
 
 def process_currency_data(currency_df, currency_code=None, currency_name=None):
     """
@@ -92,17 +91,29 @@ def plot_currency_evolution(complete_df, currency_code = None, currency_name = N
     return fig, ax, currency_code, currency_name
 
 if __name__ == "__main__":
-    conn = sqlite3.connect(ROOT / 'data/currency_rates.db')
-    c = conn.cursor()
+    print("Loading environment variables...")
+    api_key, vm_ip, verbose, ssh_host, ssh_port, ssh_user, ssh_key, remote_db_path = load_env_variables()
 
-    query = '''
+    print("Initializing SQLite connection with the environment variables...")
+    sqlite_connection = SQLiteConnection(ssh_host, ssh_port, ssh_user, ssh_key, remote_db_path)
+
+    fetch_data_query = '''
     SELECT currency_rates.Currency_Code, currency_names.Currency_Name, currency_rates.Rate, currency_rates.date
     FROM currency_rates
     JOIN currency_names
     ON currency_rates.Currency_Code = currency_names.Currency_Code
     '''
 
-    currency_df = pd.read_sql_query(query, conn)
+    stdout, stderr = sqlite_connection.execute_sqlite_commands_on_remote(fetch_data_query, verbose=False)
+    print("Raw data loaded successfully...")
+    print(stdout)
+    data = stdout.strip().split('\n')
+    columns = ["currency_code", "currency_name", "rate", "date"]
+    currency_df = pd.DataFrame([row.split('|') for row in data], columns=columns)
+    currency_df["rate"] = currency_df["rate"].astype(float)
+    print("Data loaded successfully...")
+    print("Looks like this:")
+    print(currency_df.head())
 
     concatenated_df = pd.DataFrame()
     n_currency_codes = len(currency_df["currency_code"].unique())
@@ -115,5 +126,5 @@ if __name__ == "__main__":
     fig, ax, currency_code, _ = plot_currency_evolution(concatenated_df, currency_code="EUR")
     if not os.path.exists(ROOT / "figures"):
         os.makedirs(ROOT / "figures")
-    figure_path = Path(ROOT / "figures" / f"currency_evolution_EUR.png")
+    figure_path = Path(ROOT / "figures" / f"currency_evolution_EUR_remote.png")
     fig.savefig(figure_path)

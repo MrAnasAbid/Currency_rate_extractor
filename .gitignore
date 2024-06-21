@@ -1,3 +1,10 @@
+# Test files not to be included in the final project
+src/sqlite3_vm_connector.py
+src/test_vm.py
+src/view_data.py
+src/exchange_rate.py
+src/exchange_rate_test.py
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

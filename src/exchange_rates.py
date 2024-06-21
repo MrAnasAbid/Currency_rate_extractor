@@ -10,7 +10,6 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT))
 from src.constants import BASE_CURRENCY
 from src.utils import load_env_variables
-
 """
 Main script to fetch the latest exchange rates and store them in a SQLite database
 Currency rates & codes are stored in two separate tables

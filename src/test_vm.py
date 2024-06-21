@@ -12,7 +12,7 @@ sys.path.append(str(ROOT))
 from src.constants import BASE_CURRENCY
 from src.utils import load_env_variables
 
-def execute_sqlite_commands_on_remote(ssh_host, ssh_port, ssh_user, ssh_key, remote_db_path, sql_commands):
+def execute_sqlite_commands_on_remote(ssh_host, ssh_port, ssh_user, ssh_key, remote_db_path, sql_commands, verbose = False):
     """
     Connects to a remote server via SSH and executes SQLite commands on a specified database.
 
@@ -29,6 +29,16 @@ def execute_sqlite_commands_on_remote(ssh_host, ssh_port, ssh_user, ssh_key, rem
     - stderr (str): The standard error from the executed commands.
     """
     # Create an SSH client
+    if sql_commands is None:
+        return None, "No SQL commands provided, exiting..."
+
+    if verbose:
+        print(f"ssh_host: {ssh_host}")
+        print(f"ssh_port: {ssh_port}")
+        print(f"ssh_user: {ssh_user}")
+        print(f"ssh_key: {ssh_key}")
+        print(f"remote_db_path: {remote_db_path}")
+        print(f"sql_commands: {sql_commands}")
     ssh = paramiko.SSHClient()
     ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 
@@ -38,6 +48,12 @@ def execute_sqlite_commands_on_remote(ssh_host, ssh_port, ssh_user, ssh_key, rem
 
         # Prepare the SQLite commands and pipe them into sqlite3
         commands = f"echo '{sql_commands}' | sqlite3 {remote_db_path}"
+                # Prepare the SQLite command
+        if type(sql_commands) == str:
+            sql_commands = [sql_commands]
+        commands = "; ".join(sql_commands)
+        command = f'sqlite3 {remote_db_path} "{commands}"'
+        print(command)
 
         # Execute the SQLite commands on the remote server
         stdin, stdout, stderr = ssh.exec_command(commands)
