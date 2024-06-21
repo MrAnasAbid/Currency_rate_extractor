@@ -36,19 +36,19 @@ jobs:
         env:
           EXCHANGE_RATE_API_KEY: ${{ secrets.EXCHANGE_RATE_API_KEY }}
         run: |
-          pipenv run python src/exchange_rates.py
+          pipenv run python src/extract_and_load.py
 
       - name: Run the script to clean data and generate the figure
         env:
           EXCHANGE_RATE_API_KEY: ${{ secrets.EXCHANGE_RATE_API_KEY }}
         run: |
-          pipenv run python src/clean_data.py
+          pipenv run python src/transform_and_plot.py
 
       - name: Upload generated figure
         uses: actions/upload-artifact@v2
         with:
           name: generated_figure
-          path: figures/currency_evolution_EUR.png
+          path: figures/currency_evolution_EUR_vm.png
 
       - name: Commit files
         run: |
