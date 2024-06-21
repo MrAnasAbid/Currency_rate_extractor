@@ -1,4 +1,3 @@
-
 def currency_code_queries(codes):
     queries_list = []
     new_currency_names = 0
