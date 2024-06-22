@@ -18,7 +18,7 @@ This script is to be ran daily
 """
 
 # Load environment variables from a .env file
-api_key, vm_ip, verbose, ssh_host, ssh_port, ssh_user, ssh_key, remote_db_path = load_env_variables()
+api_key, vm_ip, verbose, ssh_host, ssh_port, ssh_user, ssh_key, remote_db_path, remote_ssh = load_env_variables()
 
 def fetch_and_merge_exchange_rates():
     # Request the latest exchange rates and extract the json data

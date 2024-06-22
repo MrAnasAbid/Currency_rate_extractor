@@ -92,7 +92,7 @@ def plot_currency_evolution(complete_df, currency_code = None, currency_name = N
 
 if __name__ == "__main__":
     print("Loading environment variables...")
-    api_key, vm_ip, verbose, ssh_host, ssh_port, ssh_user, ssh_key, remote_db_path = load_env_variables()
+    api_key, vm_ip, verbose, ssh_host, ssh_port, ssh_user, ssh_key, remote_db_path, remote_ssh = load_env_variables()
 
     print("Initializing SQLite connection with the environment variables...")
     sqlite_connection = SQLiteConnection(ssh_host, ssh_port, ssh_user, ssh_key, remote_db_path)

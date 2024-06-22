@@ -21,9 +21,10 @@ def load_env_variables():
     ssh_host = os.getenv('SSH_HOST')
     ssh_port = int(os.getenv('SSH_PORT', 22))  # default to port 22 if not set
     ssh_user = os.getenv('SSH_USER')
-    ssh_key = os.getenv('SSH_KEY')
+    ssh_key = os.getenv('SSH_KEY_LOCAL')
     remote_db_path = os.getenv('REMOTE_DB')
-    return api_key, vm_ip, verbose, ssh_host, ssh_port, ssh_user, ssh_key, remote_db_path
+    remote_ssh_key = os.getenv('SSH_KEY_REMOTE')
+    return api_key, vm_ip, verbose, ssh_host, ssh_port, ssh_user, ssh_key, remote_db_path, remote_ssh_key
 
 class SQLiteConnection:
     def __init__(self, ssh_host, ssh_port, ssh_user, ssh_key, remote_db_path):
