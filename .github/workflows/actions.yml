@@ -33,10 +33,11 @@ jobs:
         run: |
           pipenv install --dev
 
-      - name: Set up SSH keys
-        uses: webfactory/ssh-agent@v0.5.4
-        with:
-          ssh-private-key: ${{ secrets.SSH_KEY }}
+      - name: Write SSH keys
+        run: |
+          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          echo "${{ secrets.PRIVATE_REMOTE_KEY }}" > ~/.ssh/id_rsa
+          ssh-keyscan -H host.example.com > ~/.ssh/known_hosts
 
       - name: Run the script on the VM
         env:

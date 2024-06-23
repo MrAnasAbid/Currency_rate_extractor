@@ -3,28 +3,29 @@ import paramiko
 
 def load_env_variables():
     """
-    Load environment variables and return them.
-    
+    Load environment variables from the .env file.
+
     Returns:
-    - api_key (str): API key for exchange rate service.
-    - vm_ip (str): IP address of the VM.
-    - verbose (str): Verbose mode flag.
-    - ssh_host (str): SSH host address.
-    - ssh_port (int): SSH port.
-    - ssh_user (str): SSH username.
-    - ssh_key (str): Path to SSH private key.
-    - remote_db_path (str): Path to the SQLite database on the remote server.
+    - api_key (str): The API key for the exchange rate API.
+    - ssh_host (str): The hostname or IP address of the remote server.
+    - ssh_port (int): The port number for SSH connection.
+    - ssh_user (str): The username for SSH authentication.
+    - ssh_key (str): The path to the private SSH key file for authentication.
+    - remote_db_path (str): The file path to the SQLite database on the remote server.
+    - remote_ssh_key (str): The path to the public SSH key file for authentication.
+    - private_remote_key (str): The path to the private SSH key file for authentication.
+    - verbose (bool): Whether to print detailed information.
     """
-    api_key = os.getenv('EXCHANGE_RATE_API_KEY')
-    vm_ip = os.getenv('VM_IP_ADDRESS')
-    verbose = os.getenv('VERBOSE')
-    ssh_host = os.getenv('SSH_HOST')
+    api_key = os.getenv('EXCHANGE_RATE_API_KEY', None)
+    ssh_host = os.getenv('SSH_HOST', None)
     ssh_port = int(os.getenv('SSH_PORT', 22))  # default to port 22 if not set
-    ssh_user = os.getenv('SSH_USER')
-    ssh_key = os.getenv('SSH_KEY_LOCAL')
-    remote_db_path = os.getenv('REMOTE_DB')
-    remote_ssh_key = os.getenv('SSH_KEY_REMOTE')
-    return api_key, vm_ip, verbose, ssh_host, ssh_port, ssh_user, ssh_key, remote_db_path, remote_ssh_key
+    ssh_user = os.getenv('SSH_USER', None)
+    local_ssh_key = os.getenv('SSH_KEY_LOCAL_PATH', None)
+    remote_ssh_key = os.getenv('SSH_KEY_REMOTE_PATH', None)
+    private_remote_key = os.getenv('PRIVATE_KEY_PATH', None)
+    remote_db_path = os.getenv('REMOTE_DB_PATH', None)
+    verbose = os.getenv('VERBOSE', False)
+    return api_key, ssh_host, ssh_port, ssh_user, local_ssh_key, remote_ssh_key, private_remote_key, remote_db_path, verbose
 
 class SQLiteConnection:
     def __init__(self, ssh_host, ssh_port, ssh_user, ssh_key, remote_db_path):
@@ -58,6 +59,12 @@ class SQLiteConnection:
         try:
             # Connect to the remote server
             ssh.connect(self.ssh_host, port=self.ssh_port, username=self.ssh_user, key_filename=self.ssh_key)
+
+            # Run a command to check the shell
+            stdin, stdout, stderr = ssh.exec_command("echo $SHELL")
+            shell = stdout.read().decode().strip()
+            if verbose:
+                print(f"Remote shell: {shell}")
 
             # Prepare the SQLite commands
             commands = "; ".join(sql_commands)

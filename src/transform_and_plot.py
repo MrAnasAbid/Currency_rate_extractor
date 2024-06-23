@@ -92,10 +92,14 @@ def plot_currency_evolution(complete_df, currency_code = None, currency_name = N
 
 if __name__ == "__main__":
     print("Loading environment variables...")
-    api_key, vm_ip, verbose, ssh_host, ssh_port, ssh_user, ssh_key, remote_db_path, remote_ssh = load_env_variables()
+    api_key, ssh_host, ssh_port, ssh_user, local_ssh_key, remote_ssh_key, private_remote_key, remote_db_path, verbose = load_env_variables()
+
+    # VERY bad practice incoming
+    if verbose == "REMOTE":
+        local_ssh_key = remote_ssh_key
 
     print("Initializing SQLite connection with the environment variables...")
-    sqlite_connection = SQLiteConnection(ssh_host, ssh_port, ssh_user, ssh_key, remote_db_path)
+    sqlite_connection = SQLiteConnection(ssh_host, ssh_port, ssh_user, local_ssh_key, remote_db_path)
 
     fetch_data_query = '''
     SELECT currency_rates.Currency_Code, currency_names.Currency_Name, currency_rates.Rate, currency_rates.date
