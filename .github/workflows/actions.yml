@@ -35,10 +35,11 @@ jobs:
 
       - name: Write SSH keys
         run: |
-          install -m 600 -D /dev/null ~/.ssh/id_rsa
+          mkdir -p ~/.ssh
           echo "${{ secrets.PRIVATE_REMOTE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          echo "${{ secrets.REMOTE_PUBLIC_KEY }}" >> ~/.ssh/known_hosts
+          ssh-keyscan -p 22 ${{ secrets.REMOTE_PUBLIC_KEY }} >> ~/.ssh/known_hosts
+          sudo apt-get install sshpass
           
       - name: Run the script on the VM
         env:
@@ -50,14 +51,7 @@ jobs:
           SSH_KEY_LOCAL_PATH : ${{ secrets.SSH_KEY_LOCAL_PATH }}
           REMOTE_DB_PATH : ${{ secrets.REMOTE_DB_PATH }}
         run: |
-          ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'pipenv run python src/extract_and_load.py'
-
-      - name: Setup Border0 action
-        if: ${{ failure() }}
-        uses: borderzero/gh-action@v2
-        with:
-          token: ${{ secrets.BORDER0_ADMIN_TOKEN }}
-          wait-for: 15
+          sshpass -p '' ssh -v -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'pipenv run python src/extract_and_load.py'
 
       - name: Run the script to clean data and generate the figure
         env:
