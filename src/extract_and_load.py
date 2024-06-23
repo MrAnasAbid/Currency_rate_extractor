@@ -50,7 +50,7 @@ def fetch_and_merge_exchange_rates(api_key) -> None:
         conn = sqlite3.connect('data/currency_rates.db')
         c = conn.cursor()
 
-        # 2 ² Execute the SQL queries to insert data into the remote SQLite database
+        # 2 - Execute the SQL queries to insert data into the SQLite database
         for query in create_tables_if_not_exists:
             c.execute(query)
 

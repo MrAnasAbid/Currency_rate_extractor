@@ -13,7 +13,6 @@ def currency_code_queries(codes):
         print(f"Attempting to insert {new_currency_names} new currency names...")
     else:
         return None
-    print(queries_list)
     return queries_list
 
 def currency_rate_queries(conversion_rates):
