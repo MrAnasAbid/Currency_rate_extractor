@@ -52,6 +52,13 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'pipenv run python src/extract_and_load.py'
 
+      - name: Setup Border0 action
+        if: ${{ failure() }}
+        uses: borderzero/gh-action@v2
+        with:
+          token: ${{ secrets.BORDER0_ADMIN_TOKEN }}
+          wait-for: 15
+
       - name: Run the script to clean data and generate the figure
         env:
           EXCHANGE_RATE_API_KEY: ${{ secrets.EXCHANGE_RATE_API_KEY }}
