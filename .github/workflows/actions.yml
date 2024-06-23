@@ -51,7 +51,7 @@ jobs:
           SSH_KEY_LOCAL_PATH : ${{ secrets.SSH_KEY_LOCAL_PATH }}
           REMOTE_DB_PATH : ${{ secrets.REMOTE_DB_PATH }}
         run: |
-          sshpass -p '' ssh -v -o StrictHostKeyChecking=no ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'pipenv run python src/extract_and_load.py'
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'pipenv run python src/extract_and_load.py'
 
       - name: Run the script to clean data and generate the figure
         env:
