@@ -38,7 +38,7 @@ jobs:
           mkdir -p ~/.ssh
           echo "${{ secrets.PRIVATE_REMOTE_KEY }}" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan -p 22 ${{ secrets.REMOTE_PUBLIC_KEY }} >> ~/.ssh/known_hosts
+          ssh-keyscan -p 22 ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
           sudo apt-get install sshpass
           
       - name: Run the script on the VM
