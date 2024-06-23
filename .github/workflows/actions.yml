@@ -43,19 +43,19 @@ jobs:
       - name: Run the script on the VM
         env:
           EXCHANGE_RATE_API_KEY: ${{ secrets.EXCHANGE_RATE_API_KEY }}
-          REMOTE_DB: ${{ secrets.REMOTE_DB }}
+          REMOTE_DB: ${{ secrets.REMOTE_DB_PATH }}
           SSH_HOST: ${{ secrets.SSH_HOST }}
           SSH_PORT: ${{ secrets.SSH_PORT }}
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_KEY_LOCAL_PATH : ${{ secrets.SSH_KEY_LOCAL_PATH }}
           REMOTE_DB_PATH : ${{ secrets.REMOTE_DB_PATH }}
         run: |
-          ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'pipenv run python src/extract_and_load.py'
+          ssh -o StrictHostKeyChecking=no -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'pipenv run python src/extract_and_load.py'
 
       - name: Run the script to clean data and generate the figure
         env:
           EXCHANGE_RATE_API_KEY: ${{ secrets.EXCHANGE_RATE_API_KEY }}
-          REMOTE_DB: ${{ secrets.REMOTE_DB }}
+          REMOTE_DB: ${{ secrets.REMOTE_DB_PATH }}
         run: |
           ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'pipenv run python src/transform_and_plot.py'
 
