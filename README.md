@@ -28,7 +28,7 @@
 * Output: Generate and save visualizations of currency rate trends.
 
 ## Automation
-* *GitHub Actions*: Automate the entire ETL pipeline to run daily, ensuring the database is updated with the latest currency rates.
+* **GitHub Actions**: Automate the entire ETL pipeline to run daily, ensuring the database is updated with the latest currency rates.
 
 ## Improvements
 * The current database is hosted in this GitHub repo (data/currency_rates.db) which isn't ideal. The next step includes hosting it on a virtual machine (WIP, branch SSH_VM).
