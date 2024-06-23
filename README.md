@@ -1,12 +1,13 @@
 ## Project Goal
 * Develop an **ETL** (Extract, Transform, Load) pipeline to fetch, process, and store daily currency rates.
 * Automate the pipeline using **GitHub Actions** for daily updates.
-
-* Create an ETL pipeline to fetch daily currency rates, track changes, and analyze their evolution.
-
+  
 ## Data Source
 * Exchange Rate API: Provides daily currency rates.
 * URL : https://www.exchangerate-api.com/
+
+## Main Tools
+![Tools](https://github.com/MrAnasAbid/Currency_rate_extractor/assets/115592120/f9a24e8b-1cad-4e28-bc06-c7a46f7a9dd4)
 
 ## Steps
 ### 1. Extract
