@@ -37,12 +37,18 @@ jobs:
         run: |
           install -m 600 -D /dev/null ~/.ssh/id_rsa
           echo "${{ secrets.PRIVATE_REMOTE_KEY }}" > ~/.ssh/id_rsa
-          ssh-keyscan -H host.example.com > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.REMOTE_PUBLIC_KEY }} >> ~/.ssh/known_hosts
 
       - name: Run the script on the VM
         env:
           EXCHANGE_RATE_API_KEY: ${{ secrets.EXCHANGE_RATE_API_KEY }}
           REMOTE_DB: ${{ secrets.REMOTE_DB }}
+          SSH_HOST: ${{ secrets.SSH_HOST }}
+          SSH_PORT: ${{ secrets.SSH_PORT }}
+          SSH_USER: ${{ secrets.SSH_USER }}
+          SSH_KEY_LOCAL_PATH : ${{ secrets.SSH_KEY_LOCAL_PATH }}
+          REMOTE_DB_PATH : ${{ secrets.REMOTE_DB_PATH }}
         run: |
           ssh -p ${{ secrets.SSH_PORT }} ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} 'pipenv run python src/extract_and_load.py'
 
