@@ -18,6 +18,7 @@
 * Task: Load the extracted data into an SQLite database (currency_rates.db).
 * Database Operations: Insert new values or ignore existing ones using SQL queries.
 ![UI_preview](https://github.com/MrAnasAbid/Currency_rate_extractor/Database_schema.png)
+
 ### 3. Transform
 * File: *src/transform_and_plot.py*
 * Task: Transform the data by joining tables, parsing dates, and filling missing values.
