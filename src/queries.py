@@ -2,6 +2,7 @@ def currency_code_queries(codes):
     queries_list = []
     new_currency_names = 0
     for _, row in codes.iterrows():
+        row['currency_name'] = row['currency_name'].replace("'", "")
         single_query = f"""
         INSERT OR IGNORE INTO currency_names (currency_code, currency_name)
         VALUES ('{row['currency_code']}', '{row['currency_name']}');
@@ -12,6 +13,7 @@ def currency_code_queries(codes):
         print(f"Attempting to insert {new_currency_names} new currency names...")
     else:
         return None
+    print(queries_list)
     return queries_list
 
 def currency_rate_queries(conversion_rates):

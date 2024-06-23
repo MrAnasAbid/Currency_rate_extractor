@@ -3,6 +3,7 @@ import sys
 import requests
 import pandas as pd
 import paramiko
+import sqlite3
 import matplotlib.pyplot as plt
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
@@ -94,26 +95,21 @@ if __name__ == "__main__":
     print("Loading environment variables...")
     api_key, ssh_host, ssh_port, ssh_user, local_ssh_key, remote_ssh_key, private_remote_key, remote_db_path, verbose = load_env_variables()
 
-    # VERY bad practice incoming
-    if verbose == "REMOTE":
-        local_ssh_key = remote_ssh_key
-
-    print("Initializing SQLite connection with the environment variables...")
-    sqlite_connection = SQLiteConnection(ssh_host, ssh_port, ssh_user, local_ssh_key, remote_db_path)
-
     fetch_data_query = '''
     SELECT currency_rates.Currency_Code, currency_names.Currency_Name, currency_rates.Rate, currency_rates.date
     FROM currency_rates
     JOIN currency_names
     ON currency_rates.Currency_Code = currency_names.Currency_Code
     '''
+    
+    conn = sqlite3.connect('data/currency_rates.db')
+    c = conn.cursor()
 
-    stdout, stderr = sqlite_connection.execute_sqlite_commands_on_remote(fetch_data_query, verbose=False)
-    print("Raw data loaded successfully...")
-    print(stdout)
-    data = stdout.strip().split('\n')
-    columns = ["currency_code", "currency_name", "rate", "date"]
-    currency_df = pd.DataFrame([row.split('|') for row in data], columns=columns)
+    data = pd.read_sql_query(fetch_data_query, conn)
+    print("Data loaded successfully...")
+    print(data.head())
+
+    currency_df = pd.read_sql_query(fetch_data_query, conn)
     currency_df["rate"] = currency_df["rate"].astype(float)
     print("Data loaded successfully...")
     print("Looks like this:")
@@ -130,5 +126,5 @@ if __name__ == "__main__":
     fig, ax, currency_code, _ = plot_currency_evolution(concatenated_df, currency_code="EUR")
     if not os.path.exists(ROOT / "figures"):
         os.makedirs(ROOT / "figures")
-    figure_path = Path(ROOT / "figures" / f"currency_evolution_EUR_remote.png")
+    figure_path = Path(ROOT / "figures" / f"currency_evolution_EUR.png")
     fig.savefig(figure_path)

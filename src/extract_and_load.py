@@ -3,6 +3,7 @@ import sys
 import requests
 import pandas as pd
 import paramiko
+import sqlite3
 from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.append(str(ROOT))
@@ -11,7 +12,7 @@ from src.utils import load_env_variables, SQLiteConnection
 from src.queries import create_tables_queries, currency_code_queries, currency_rate_queries
 #from src.test_vm import execute_sqlite_commands_on_remote
 
-def fetch_and_merge_exchange_rates(sqlite_connection: SQLiteConnection) -> None:
+def fetch_and_merge_exchange_rates(api_key) -> None:
     try:
         # Extraction Phase
         # 1 - Request the latest exchange rates and extract the json data
@@ -46,10 +47,20 @@ def fetch_and_merge_exchange_rates(sqlite_connection: SQLiteConnection) -> None:
         insert_or_ignore_into_currency_codes = currency_code_queries(codes)
         insert_or_ignore_into_currency_rate = currency_rate_queries(conversion_rates)
 
-        # 2 - Execute SQL commands on remote SQLite database (by calling sqlite_conncetion object)
-        stdout, stderr = sqlite_connection.execute_sqlite_commands_on_remote(create_tables_if_not_exists, verbose=False)
-        stdout, stderr = sqlite_connection.execute_sqlite_commands_on_remote(insert_or_ignore_into_currency_codes, verbose=False)
-        stdout, stderr = sqlite_connection.execute_sqlite_commands_on_remote(insert_or_ignore_into_currency_rate, verbose=False)
+        conn = sqlite3.connect('data/currency_rates.db')
+        c = conn.cursor()
+
+        # 2 ² Execute the SQL queries to insert data into the remote SQLite database
+        for query in create_tables_if_not_exists:
+            c.execute(query)
+
+        for query in insert_or_ignore_into_currency_codes:
+            c.execute(query)
+
+        for query in insert_or_ignore_into_currency_rate:
+            c.execute(query)
+
+        conn.commit()
     
     except requests.exceptions.RequestException as e:
         print(f"An error occurred during API request: {e}")
@@ -61,12 +72,5 @@ if __name__ == '__main__':
     print("Loading environment variables...")
     api_key, ssh_host, ssh_port, ssh_user, local_ssh_key, remote_ssh_key, private_remote_key, remote_db_path, verbose = load_env_variables()
 
-    # VERY bad practice incoming
-    if verbose == "REMOTE":
-        local_ssh_key = remote_ssh_key
-
-    print("Initializing SQLite connection with the environment variables...")
-    sqlite_connection = SQLiteConnection(ssh_host, ssh_port, ssh_user, local_ssh_key, remote_db_path)
-
     print("Main function: Fetching and merging exchange rates...")
-    fetch_and_merge_exchange_rates(sqlite_connection)
+    fetch_and_merge_exchange_rates(api_key)
