@@ -21,21 +21,23 @@
 * File: *src/extract_and_load.py*
 * Task: Load the extracted data into an SQLite database (currency_rates.db).
 * Database Operations: Insert new values or ignore existing ones using SQL queries.
+  
 ![Database_schema](https://github.com/MrAnasAbid/Currency_rate_extractor/assets/115592120/f869ed1c-5beb-41db-8135-5de21fdc2ee3)
 ### 3. Transform
-* File: *src/transform_and_plot.py*
+* File: **src/transform_and_plot.py**
 * Task: Transform the data by joining tables, parsing dates, and filling missing values.
 ### 4. Plot Data (Optional step)
-* File: *src/transform_and_plot.py*
+* File: **src/transform_and_plot.py**
 * Task: Plot the evolution of specific currency rates over time (e.g., EUR).
 * Output: Generate and save visualizations of currency rate trends.
 
 ## Automation
-* **GitHub Actions**: Automate the entire ETL pipeline to run daily, ensuring the database is updated with the latest currency rates.
+* **GitHub Actions**: Automate the entire ETL pipeline to run daily, ensuring the database is updated with the latest currency rates, an artifact with a sample plot is generated (evolution of EURO currency rates)
 
 ## Improvements
 * The current database is hosted in this GitHub repo (data/currency_rates.db) which isn't ideal. The next step includes hosting it on a virtual machine (WIP, branch SSH_VM).
 * Create and deploy a dashboard (with Dash) to visualize more detailed information about the data.
+* Enhance code readability and robustness (pylint a pytest)
 
 ## How to Use
 * Clone the repository
