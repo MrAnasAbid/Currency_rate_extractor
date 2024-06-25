@@ -14,11 +14,11 @@
 
 ## Workflow Overview
 ### 1. Extract
-* File: *src/extract_and_load.py*
+* File: **src/extract_and_load.py**
 * Task: Extract daily currency rates and codes from the Exchange Rate API.
 * Output: Data stored in pandas DataFrames.
 ### 2. Load
-* File: *src/extract_and_load.py*
+* File: **src/extract_and_load.py**
 * Task: Load the extracted data into an SQLite database (currency_rates.db).
 * Database Operations: Insert new values or ignore existing ones using SQL queries.
   
@@ -37,7 +37,7 @@
 ## Improvements
 * The current database is hosted in this GitHub repo (data/currency_rates.db) which isn't ideal. The next step includes hosting it on a virtual machine (WIP, branch SSH_VM).
 * Create and deploy a dashboard (with Dash) to visualize more detailed information about the data.
-* Enhance code readability and robustness (pylint a pytest)
+* Enhance code readability and robustness (pylint and pytest)
 
 ## How to Use
 * Clone the repository
