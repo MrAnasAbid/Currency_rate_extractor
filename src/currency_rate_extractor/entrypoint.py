@@ -4,8 +4,8 @@ import sqlite3
 import pandas as pd
 from pathlib import Path
 import plotly.offline as offline
-from currency_rate_extractor.transform_and_plot import process_currency_data, plot_currency_evolution
 
+from currency_rate_extractor.transform_and_plot import process_currency_data, plot_currency_evolution
 from currency_rate_extractor.extract_and_load import fetch_and_merge_exchange_rates
 from currency_rate_extractor.queries import create_tables_queries, currency_code_queries, currency_rate_queries
 
