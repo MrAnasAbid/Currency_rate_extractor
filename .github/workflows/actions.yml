@@ -27,7 +27,7 @@ jobs:
         script: |
           set -e
           cd /root/projects/currency_rate_extractor
-          git pull origin SSH_VM
+          git pull origin Switch_to_PDM
           /root/.local/bin/pdm install
           /root/.local/bin/pdm venv activate
           /root/.local/bin/pdm run python tests/health_check.py
