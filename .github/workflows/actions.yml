@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: [ main ]
+    branches: [ Switch_to_PDM ]
 
 jobs:
   build:
