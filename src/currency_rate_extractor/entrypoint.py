@@ -2,14 +2,18 @@ import logging
 import os
 import sqlite3
 import pandas as pd
-from pathlib import Path
 import plotly.offline as offline
+from pathlib import Path
+from dotenv import load_dotenv
 
 from currency_rate_extractor.transform_and_plot import process_currency_data, plot_currency_evolution
 from currency_rate_extractor.extract_and_load import fetch_and_merge_exchange_rates
 from currency_rate_extractor.queries import create_tables_queries, currency_code_queries, currency_rate_queries
 
-ROOT = os.getenv("ROOT",)
+load_dotenv()
+
+ROOT = os.getenv("ROOT")
+PATH_TO_DB = os.getenv("PATH_TO_DATABASE")
 
 logging.basicConfig(
     level=logging.INFO,  # Set to DEBUG for more detailed output
@@ -34,7 +38,7 @@ def main():
     JOIN currency_names
     ON currency_rates.Currency_Code = currency_names.Currency_Code
     '''
-    conn = sqlite3.connect('data/currency_rates.db')
+    conn = sqlite3.connect(str(Path(ROOT, PATH_TO_DB)))
     c = conn.cursor()
 
     data = pd.read_sql_query(load_and_join_data_query, conn)
@@ -54,12 +58,13 @@ def main():
         df, _, _ = process_currency_data(currency_df, currency_code=currency_code)
         concatenated_df = pd.concat([concatenated_df, df], axis=0)
 
-    print(concatenated_df)
+    logging.info("Successfully processed all currency codes, plotting currency evolution...")
     fig, currency_code, _ = plot_currency_evolution(concatenated_df, currency_code="EUR")
     if not os.path.exists(Path(ROOT, "figures")):
         os.makedirs(Path(ROOT, "figures"))
     figure_path = (Path(ROOT, "figures", f"currency_evolution_EURO.html"))
     offline.plot(fig, filename=str(figure_path))
+    logging.info(f"Figure saved at {figure_path}")
 
 if __name__ == "__main__":
     main()

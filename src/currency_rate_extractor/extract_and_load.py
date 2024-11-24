@@ -2,10 +2,10 @@ import os
 import requests
 import pandas as pd
 import sqlite3
-from pathlib import Path
 import logging
+from pathlib import Path
+from dotenv import load_dotenv
 
-from currency_rate_extractor.constants import BASE_CURRENCY, ROOT
 from currency_rate_extractor.queries import create_tables_queries, currency_code_queries, currency_rate_queries
 
 # Configure logging
@@ -17,6 +17,12 @@ logging.basicConfig(
         logging.StreamHandler()
     ]
 )
+
+load_dotenv()
+
+ROOT = os.getenv("ROOT")
+PATH_TO_DB = os.getenv("PATH_TO_DATABASE")
+BASE_CURRENCY = "USD"
 
 def fetch_and_merge_exchange_rates(api_key) -> None:
     try:
@@ -53,7 +59,7 @@ def fetch_and_merge_exchange_rates(api_key) -> None:
         insert_or_ignore_into_currency_codes = currency_code_queries(codes)
         insert_or_ignore_into_currency_rate = currency_rate_queries(conversion_rates)
 
-        conn = sqlite3.connect('data/currency_rates.db')
+        conn = sqlite3.connect(str(Path(ROOT, PATH_TO_DB)))
         c = conn.cursor()
 
         # Execute the SQL queries

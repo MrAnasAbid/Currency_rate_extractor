@@ -1,5 +1,13 @@
 from pathlib import Path
 import sqlite3
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+ROOT = os.getenv("ROOT")
+PATH_TO_DB = os.getenv("PATH_TO_DATABASE")
 
 def show_schema(db_path):
     # Connect to the SQLite database
@@ -21,5 +29,5 @@ def show_schema(db_path):
 
 # Example usage
 if __name__ == "__main__":
-    db_path = 'data/currency_rates.db'  # Replace with the path to your SQLite database
+    db_path = str(Path(ROOT, PATH_TO_DB)) # Replace with the path to your SQLite database
     show_schema(db_path)

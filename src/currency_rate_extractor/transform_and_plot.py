@@ -9,7 +9,7 @@ from plotly.subplots import make_subplots
 from pathlib import Path
 from typing import List, Tuple
 
-from currency_rate_extractor.constants import ROOT
+from dotenv import load_dotenv
 
 # Configure logging
 logging.basicConfig(
@@ -20,6 +20,11 @@ logging.basicConfig(
         logging.StreamHandler()
     ]
 )
+
+load_dotenv()
+
+ROOT = os.getenv("ROOT")
+PATH_TO_DB = os.getenv("PATH_TO_DATABASE")
 
 def process_currency_data(currency_df:pd.DataFrame, 
                           currency_code:str=None, 
@@ -120,7 +125,7 @@ if __name__ == "__main__":
     ON currency_rates.Currency_Code = currency_names.Currency_Code
     '''
     
-    conn = sqlite3.connect('data/currency_rates.db')
+    conn = sqlite3.connect(str(Path(ROOT, PATH_TO_DB)))
     c = conn.cursor()
 
     data = pd.read_sql_query(fetch_data_query, conn)
