@@ -63,7 +63,7 @@ def main():
     if not os.path.exists(Path(ROOT, "figures")):
         os.makedirs(Path(ROOT, "figures"))
     figure_path = (Path(ROOT, "figures", f"currency_evolution_EURO.html"))
-    offline.plot(fig, filename=str(figure_path))
+    offline.plot(fig, filename=str(figure_path), auto_open=False)
     logging.info(f"Figure saved at {figure_path}")
 
 if __name__ == "__main__":
