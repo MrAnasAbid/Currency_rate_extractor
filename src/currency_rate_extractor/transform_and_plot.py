@@ -3,28 +3,20 @@ import pandas as pd
 import sqlite3
 import plotly.graph_objects as go
 import plotly.offline as offline
-import logging
 
 from plotly.subplots import make_subplots
 from pathlib import Path
 from typing import List, Tuple
 
 from dotenv import load_dotenv
+from currency_rate_extractor.custom_logging import get_classic_logger
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,  # Set to DEBUG for more detailed output
-    format='%(asctime)s - %(levelname)s - %(message)s',
-    handlers=[
-        logging.FileHandler("currency_rate_extractor.log"),
-        logging.StreamHandler()
-    ]
-)
+logger = get_classic_logger()
 
 load_dotenv()
 
 ROOT = os.getenv("ROOT")
-PATH_TO_DB = os.getenv("PATH_TO_DATABASE")
+PATH_TO_DB = Path("data/currency_rates.db")
 
 def process_currency_data(currency_df:pd.DataFrame, 
                           currency_code:str=None, 
@@ -125,23 +117,23 @@ if __name__ == "__main__":
     ON currency_rates.Currency_Code = currency_names.Currency_Code
     '''
     
-    conn = sqlite3.connect(str(Path(ROOT, PATH_TO_DB)))
+    conn = sqlite3.connect(Path(ROOT, PATH_TO_DB))
     c = conn.cursor()
 
     data = pd.read_sql_query(fetch_data_query, conn)
-    logging.info("Data loaded successfully...")
+    logger.info("Data loaded successfully...")
     print(data.head())
 
     currency_df = pd.read_sql_query(fetch_data_query, conn)
     currency_df["rate"] = currency_df["rate"].astype(float)
-    logging.info("Data loaded successfully...")
-    logging.info("Looks like this:")
+    logger.info("Data loaded successfully...")
+    logger.info("Looks like this:")
     print(currency_df.head())
 
     concatenated_df = pd.DataFrame()
     n_currency_codes = len(currency_df["currency_code"].unique())
     for i, currency_code in enumerate(list(currency_df["currency_code"].unique())):
-        logging.info(f"{i+1} / {n_currency_codes} Processing currency {currency_code}")
+        logger.info(f"{i+1} / {n_currency_codes} Processing currency {currency_code}")
         df, _, _ = process_currency_data(currency_df, currency_code=currency_code)
         concatenated_df = pd.concat([concatenated_df, df], axis=0)
 

@@ -1,33 +1,33 @@
 [project]
 name = "currency_rate_extractor"
 version = "0.1.0"
-description = "Default template for PDM package"
-authors = [
-    {name = "MrAnasAbid", email = "m.abid.anas@gmail.com"},
-]
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
 dependencies = [
     "pandas>=2.2.3",
     "requests>=2.32.3",
     "python-dotenv>=1.0.1",
     "paramiko>=3.5.0",
     "matplotlib>=3.9.2",
-    "currency-rate-extractor @ file:///${PROJECT_ROOT}/",
     "plotly>=5.24.1",
     "dash>=2.18.2",
     "nbformat>=5.10.4",
     "statsmodels>=0.14.4",
     "kaleido==0.2.1",
-    "ipykernel>=6.29.5",
+    "currency_rate_extractor",
 ]
-requires-python = "==3.9.*"
-readme = "README.md"
-license = {text = "MIT"}
 
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
 
-[tool.pdm]
-distribution = true
+[tool.uv]
+managed = true
+package = true
 
-[tool.pdm.dev-dependencies]
+[dependency-groups]
 dev = [
-    "currency-rate-extractor @ file:///${PROJECT_ROOT}/",
+    "ipykernel>=6.29.5",
+    "pytest",
 ]
