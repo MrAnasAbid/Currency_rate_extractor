@@ -20,7 +20,7 @@ jobs:
 
       - name: Install pipenv
         run: |
-          python -m pip install --upgrade pipenv wheel
+          curl -LsSf https://astral.sh/uv/install.sh | sh
       - id: cache-pipenv
         uses: actions/cache@v3
         with:
@@ -30,19 +30,19 @@ jobs:
       - name: Install dependencies
         if: steps.cache-pipenv.outputs.cache-hit != 'true'
         run: |
-          pipenv install --dev 
+          uv sync --all-groups 
         
       - name: Run the script
         env:
           EXCHANGE_RATE_API_KEY: ${{ secrets.EXCHANGE_RATE_API_KEY }}
         run: |
-          pipenv run python src/extract_and_load.py
+          uv run python src/extract_and_load.py
 
       - name: Run the script to clean data and generate the figure
         env:
           EXCHANGE_RATE_API_KEY: ${{ secrets.EXCHANGE_RATE_API_KEY }}
         run: |
-          pipenv run python src/transform_and_plot.py
+          uv run python src/transform_and_plot.py
 
       - name: Upload generated figure
         uses: actions/upload-artifact@v4

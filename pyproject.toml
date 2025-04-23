@@ -1,0 +1,20 @@
+[project]
+name = "currency_rate_extractor"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Your Name", email = "your.email@example.com"},
+]
+dependencies = [
+    "pandas",
+    "requests",
+    "python-dotenv",
+    "matplotlib",
+    "paramiko",
+]
+requires-python = ">=3.9"
+
+[project.optional-dependencies]
+dev = [
+    "ipykernel",
+]
