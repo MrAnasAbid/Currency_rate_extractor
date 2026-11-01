@@ -1,17 +1,18 @@
+
 name: Extract Exchange Rates Pipeline
 
 on:
   push:
   schedule:
-    - cron: '0 0 * * *'
-  workflow_dispatch:
+    - cron: '0 0 * * *'  # Runs daily at midnight UTC
+  workflow_dispatch:      # Allows manual triggering
 
 permissions:
   contents: write
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       - name: Checkout code
@@ -28,15 +29,18 @@ jobs:
           enable-cache: true
 
       - name: Install dependencies
-        run: uv sync --all-groups
+        run: |
+          uv sync --all-groups
 
-      - name: Run extraction
+      - name: Run the script
         env:
           EXCHANGE_RATE_API_KEY: ${{ secrets.EXCHANGE_RATE_API_KEY }}
-        run: uv run python src/extract_and_load.py
+        run: |
+          uv run python src/extract_and_load.py
 
-      - name: Run transformation and plotting
-        run: uv run python src/transform_and_plot.py
+      - name: Run the script to clean data and generate the figure
+        run: |
+          uv run python src/transform_and_plot.py
 
       - name: Upload generated figure
         uses: actions/upload-artifact@v4
